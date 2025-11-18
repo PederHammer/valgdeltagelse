@@ -10,17 +10,14 @@ STATBANK_URL = "https://api.statbank.dk/v1/data/KVRES/CSV"
 
 
 def fetch_csv():
-    # VIGTIGT: her vælger vi eksplicit værdier for VALRES,
-    # ellers får vi fejlen "Der skal vælges værdier for variabel: VALRES"
+    # KVRES: valg til kommunalbestyrelser efter område, valgresultat og tid
+    # Endpointet er allerede /KVRES/CSV, så vi skal KUN sende variablerne i body
     body = {
-        "table": "KVRES",
-        "format": "CSV",
-        "time": ["2021"],     # kommunalvalget 2021
-        "OMRÅDE": ["*"],      # alle kommuner
-        # her vælger vi TO rækker per kommune:
-        # - VÆLGERE: antal stemmeberettigede
-        # - AFGIVNE STEMMER: antal afgivne stemmer
-        "VALRES": ["VÆLGERE", "AFGIVNE STEMMER"],
+        "time": ["2021"],          # kommunalvalget 2021
+        "OMRÅDE": ["*"],           # alle kommuner
+        # I tabellen hedder variablen typisk VALGRESULTAT, mens fejlteksten kalder den VALRES
+        # Her vælger vi to typer: stemmeberettigede og afgivne stemmer
+        "VALGRESULTAT": ["VÆLGERE", "AFGIVNE STEMMER"],
     }
 
     print("Request body:", json.dumps(body, ensure_ascii=False))
@@ -30,6 +27,7 @@ def fetch_csv():
     print(resp.text[:500])
     resp.raise_for_status()
     return resp.text
+
 
 
 def parse_csv_to_json(csv_text, output_path="data/kv2021_turnout.json"):
@@ -66,7 +64,7 @@ def parse_csv_to_json(csv_text, output_path="data/kv2021_turnout.json"):
         # Her skal vi måske justere feltnavne efter headeren,
         # men lad os starte med de mest sandsynlige:
         komkode = row.get("OMRÅDE") or row.get("KOMKODE")
-        valgtype = row.get("VALRES") or row.get("VALGRESULTAT")
+        valgtype = row.get("VALGRESULTAT") or row.get("VALRES")
         value_str = row.get("INDHOLD")
 
         if not komkode or not valgtype or value_str in (None, ""):
