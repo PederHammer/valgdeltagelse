@@ -9,24 +9,20 @@ import requests
 STATBANK_URL = "https://api.statbank.dk/v1/data"
 
 def fetch_csv():
-    # Brug det generelle /v1/data endpoint
-    # og brug det navn på variablen, som API'et selv efterlyser: VALRES
     body = {
-        "table": "KVRES",
+        "table": "VALGRESULT",
         "format": "CSV",
-        "time": ["2021"],     # kommunalvalget 2021
-        "OMRÅDE": ["*"],      # alle kommuner
-        # her gør vi det simpelt: hent ALLE værdier for variablen VALRES
-        "VALRES": ["*"],
+        "TID": ["2021"],
+        "OMRÅDE": ["*"],
+        "VALRES": ["*"]
     }
 
-    print("Request body:", json.dumps(body, ensure_ascii=False))
-    resp = requests.post(STATBANK_URL, json=body)
+    resp = requests.post("https://api.statbank.dk/v1/data", json=body)
     print("HTTP status:", resp.status_code)
-    print("Svar (første 500 tegn):")
     print(resp.text[:500])
     resp.raise_for_status()
     return resp.text
+
 
 
 
