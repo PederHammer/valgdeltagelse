@@ -5,17 +5,20 @@ import os
 
 import requests
 
-STATBANK_URL = "https://api.statbank.dk/v1/data/KVPCT/CSV"
+STATBANK_URL = "https://api.statbank.dk/v1/data/KVRES/CSV"
 
 
 def build_request_body():
+    # KVRES: Valg til kommunalbestyrelser efter område, valgresultat og tid
+    # Vi henter 2021, alle kommuner (OMRÅDE="*") og to typer:
+    # - VÆLGERE (antal stemmeberettigede)
+    # - AFGIVNE STEMMER (alle afgivne stemmer)
     body = {
-        "table": "KVPCT",
+        "table": "KVRES",
         "format": "CSV",
         "time": ["2021"],
-        # Tilpas dimensioner hvis nødvendigt. KVPCT kan have andre navne.
-        "KOMMUNE": ["*"],
-        "VALGTYPE": ["VALGDELT"],  # samlet valgdeltagelse i pct.
+        "OMRÅDE": ["*"],
+        "VALGRESULTAT": ["VÆLGERE", "AFGIVNE STEMMER"],
     }
     return body
 
@@ -23,8 +26,12 @@ def build_request_body():
 def fetch_csv():
     body = build_request_body()
     resp = requests.post(STATBANK_URL, json=body)
+    print("HTTP status:", resp.status_code)
+    print("Svar (første 500 tegn):")
+    print(resp.text[:500])
     resp.raise_for_status()
     return resp.text
+
 
 
 def parse_csv_to_json(csv_text, output_path="data/kv2021_turnout.json"):
