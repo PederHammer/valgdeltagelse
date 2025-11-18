@@ -11,13 +11,13 @@ STATBANK_URL = "https://api.statbank.dk/v1/data"
 def fetch_csv():
     # Brug det generelle /v1/data-endpoint og angiv både table og format
     body = {
-        "table": "KVRES",          # kommunalvalg-resultater
-        "format": "CSV",           # ønsket outputformat
-        "time": ["2021"],          # kommunalvalget 2021
-        "OMRÅDE": ["*"],           # alle kommuner
-        # variablen i tabellen hedder VALGRESULTAT (fejlbeskeden bruger det interne navn VALRES)
-        "VALGRESULTAT": ["VÆLGERE", "AFGIVNE STEMMER"],
-    }
+    "table": "KVRES",
+    "format": "CSV",
+    "time": ["2021"],
+    "OMRÅDE": ["*"],
+    "VALGRESULTAT": ["VÆLGERE", "AFGIVNE STEMMER"],
+}
+
 
     print("Request body:", json.dumps(body, ensure_ascii=False))
     resp = requests.post(STATBANK_URL, json=body)
