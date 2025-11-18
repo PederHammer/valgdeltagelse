@@ -9,19 +9,26 @@ import requests
 STATBANK_URL = "https://api.statbank.dk/v1/data"
 
 def fetch_csv():
+    # KVRES: kommunalvalg-resultater efter område, resultat-type (VALRES) og tid
+    # Vi henter 2021, alle kommuner og to typer:
+    # V  = stemmeberettigede (vælgere)
+    # AS = afgivne stemmer
     body = {
-        "table": "VALGRESULT",
+        "table": "KVRES",
         "format": "CSV",
-        "TID": ["2021"],
-        "OMRÅDE": ["*"],
-        "VALRES": ["*"]
+        "time": ["2021"],          # TID-variablen i tabellen
+        "OMRÅDE": ["*"],           # alle kommuner
+        "VALRES": ["V", "AS"],     # de rigtige ID-koder fra dit screenshot
     }
 
-    resp = requests.post("https://api.statbank.dk/v1/data", json=body)
+    print("Request body:", json.dumps(body, ensure_ascii=False))
+    resp = requests.post(STATBANK_URL, json=body)
     print("HTTP status:", resp.status_code)
+    print("Svar (første 500 tegn):")
     print(resp.text[:500])
     resp.raise_for_status()
     return resp.text
+
 
 
 
@@ -62,7 +69,7 @@ def parse_csv_to_json(csv_text, output_path="data/kv2021_turnout.json"):
         # Her skal vi måske justere feltnavne efter headeren,
         # men lad os starte med de mest sandsynlige:
         komkode = row.get("OMRÅDE") or row.get("KOMKODE")
-        valgtype = row.get("VALRES") or row.get("VALGRESULTAT")
+        valgtype = row.get("VALRES")
         value_str = row.get("INDHOLD")
 
         if not komkode or not valgtype or value_str in (None, ""):
