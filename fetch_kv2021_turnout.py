@@ -9,18 +9,18 @@ STATBANK_URL = "https://api.statbank.dk/v1/data/KVRES/CSV"
 
 
 def build_request_body():
-    # KVRES: Valg til kommunalbestyrelser efter område, valgresultat og tid
-    # Vi henter 2021, alle kommuner (OMRÅDE="*") og to typer:
-    # - VÆLGERE (antal stemmeberettigede)
-    # - AFGIVNE STEMMER (alle afgivne stemmer)
-    body = {
+    # KVRES: Valg til kommunalbestyrelser efter område, valgresultat (VALRES) og tid
+    # Vi tager:
+    # - 2021
+    # - alle kommuner (OMRÅDE="*")
+    # - alle valgresultat-typer (VALRES="*") – vi filtrerer senere i Python
+    return {
         "table": "KVRES",
         "format": "CSV",
         "time": ["2021"],
         "OMRÅDE": ["*"],
-        "VALGRESULTAT": ["VÆLGERE", "AFGIVNE STEMMER"],
+        "VALRES": ["*"],
     }
-    return body
 
 
 def fetch_csv():
@@ -31,6 +31,7 @@ def fetch_csv():
     print(resp.text[:500])
     resp.raise_for_status()
     return resp.text
+
 
 
 
