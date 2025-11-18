@@ -34,32 +34,23 @@ def fetch_csv():
 
 
 
-
 def parse_csv_to_json(csv_text, output_path="data/kv2021_turnout.json"):
     reader = csv.DictReader(io.StringIO(csv_text), delimiter=";")
 
-    # Print kolonnenavne til GitHub Actions log
+    # Print kolonne-navne til loggen
     print("Kolonner i CSV:", reader.fieldnames)
 
-    result = {}
+    # Print et par eksemplerækker til loggen, så vi kan se strukturen
+    for i, row in enumerate(reader):
+        print(f"Eksempel-række {i}:", row)
+        if i >= 4:  # max 5 rækker
+            break
 
-    for row in reader:
-        # Her skal vi tilpasse til de rigtige feltnavne.
-        # Første gang lader vi det gerne fejle, ser fieldnames i loggen,
-        # og retter disse tre linjer.
-        kommune_kode = row["KOMKODE"]
-        kommune_navn = row["KOMNAVN"]
-        value_str = row["INDHOLD"]
-
-        value = float(value_str.replace(",", "."))
-        result[kommune_kode] = {
-            "navn": kommune_navn,
-            "stemmeprocent": round(value, 1),
-        }
-
+    # Skriv midlertidig tom JSON-fil, så scriptet ikke fejler
     os.makedirs("data", exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
+        json.dump({}, f, ensure_ascii=False, indent=2)
+
 
 
 def main():
