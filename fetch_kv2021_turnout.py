@@ -6,17 +6,16 @@ import os
 import requests
 
 # Tabel for kommunalvalg: resultat efter område (kommune), resultat-type (VALRES) og tid
-STATBANK_URL = "https://api.statbank.dk/v1/data/KVRES/CSV"
-
+STATBANK_URL = "https://api.statbank.dk/v1/data"
 
 def fetch_csv():
-    # KVRES: valg til kommunalbestyrelser efter område, valgresultat og tid
-    # Endpointet er allerede /KVRES/CSV, så vi skal KUN sende variablerne i body
+    # Brug det generelle /v1/data-endpoint og angiv både table og format
     body = {
+        "table": "KVRES",          # kommunalvalg-resultater
+        "format": "CSV",           # ønsket outputformat
         "time": ["2021"],          # kommunalvalget 2021
         "OMRÅDE": ["*"],           # alle kommuner
-        # I tabellen hedder variablen typisk VALGRESULTAT, mens fejlteksten kalder den VALRES
-        # Her vælger vi to typer: stemmeberettigede og afgivne stemmer
+        # variablen i tabellen hedder VALGRESULTAT (fejlbeskeden bruger det interne navn VALRES)
         "VALGRESULTAT": ["VÆLGERE", "AFGIVNE STEMMER"],
     }
 
@@ -27,6 +26,7 @@ def fetch_csv():
     print(resp.text[:500])
     resp.raise_for_status()
     return resp.text
+
 
 
 
